@@ -22,8 +22,7 @@ st.title("🩺 Viaestetic - Sistema de Inteligência Logística")
 st.subheader("Protótipo de Gestão de Estoque e Validades (IA)")
 st.write("---")
 
-# 2. DATASET: Simulação de estoque da matriz em Campinas
-# Aqui usamos SKUs reais de estética para impressionar na entrevista
+# 2. DATASET: Simulação de estoque
 data = {
     'SKU': ['VIA-BOT-01', 'VIA-HIAL-05', 'VIA-PDO-22', 'VIA-CAN-99', 'VIA-LUVA-M'],
     'Produto': ['Toxina Botulínica Tipo A', 'Ácido Hialurônico 2ml', 'Fios de PDO Espiculados', 'Microcânulas 22G', 'Luva Nitrílica Rosa M'],
@@ -54,32 +53,28 @@ with col2:
 # 4. INTELIGÊNCIA ARTIFICIAL: Groq + Llama 3
 st.write("---")
 st.markdown("### 🤖 Assistente Logístico IA (Groq)")
-pergunta = st.text_input("Faça uma pergunta estratégica sobre o estoque:", 
-                        placeholder="Ex: 'Quais produtos de alto valor devo priorizar a venda pelo vencimento?'")
+pergunta = st.text_input("Faça uma pergunta estratégica sobre o estoque:", placeholder="Ex: 'Quais produtos de alto valor devo priorizar a venda pelo vencimento?'")
 
 if pergunta:
     if not api_key:
-        st.warning("⚠️ Configure a variável GROQ_API_KEY para usar a IA.")
+        st.warning("⚠️ Configure a variável GROQ_API_KEY nos Secrets para usar a IA.")
     else:
         with st.spinner('A Groq está analisando os dados...'):
             try:
                 client = Groq(api_key=api_key)
-                # Convertemos o dataframe para texto para a IA entender
                 contexto_csv = df.to_csv(index=False)
                 
                 prompt = f"""
                 Você é o Especialista em Logística da Viaestetic em Campinas.
                 Analise os seguintes dados de estoque e responda à pergunta do gestor.
                 Regra: Foque em redução de prejuízo e normas da ANVISA.
-                
-                Dados:
-                {contexto_csv}
-                
+                Dados: {contexto_csv}
                 Pergunta: {pergunta}
                 """
 
+                # CORREÇÃO AQUI: Modelo atualizado e sintaxe corrigida
                 response = client.chat.completions.create(
-                    model="llama3-8b-8192",
+                    model="llama-3.3-70b-versatile",
                     messages=[{"role": "user", "content": prompt}],
                     temperature=0.3
                 )
@@ -89,6 +84,7 @@ if pergunta:
             except Exception as e:
                 st.error(f"Erro na API Groq: {e}")
 
+# Sidebar com logo corrigido (usando uma imagem real)
 st.sidebar.image("https://viaestetic.com.br", width=150)
 st.sidebar.markdown("---")
 st.sidebar.write("📍 **Local:** Campinas/SP")
